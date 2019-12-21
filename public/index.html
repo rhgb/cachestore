@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<p>Serial: <span class="serial"></span></p>
+<p>First visit the AD page to load tracker image: <a class="link-ad">AD Page</a></p>
+<p>Then visit target page: <a class="link-target">Target Page</a></p>
+<p>Press following button to re-generate serial and load fresh tracker image in sub-pages.</p>
+<button type="button" class="btn-regen">Re-generate serial</button>
+<script>
+    function getSerial() {
+        return fetch("/serial").then(res => res.json()).then(serial => {
+            document.querySelector(".serial").textContent = serial;
+            document.querySelector(".link-ad").href = `/ad.html?serial=${serial}`;
+            document.querySelector(".link-target").href = `/target.html?serial=${serial}`;
+        });
+    }
+    getSerial();
+    document.querySelector(".btn-regen").addEventListener("click", () => {
+        fetch("/serial", {method: "POST"}).then(getSerial);
+    })
+</script>
+</body>
+</html>

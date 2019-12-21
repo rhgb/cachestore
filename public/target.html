@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>Serial: <span class="serial"></span></p>
+<p>We're loading tracker image <span style="color: darkcyan; font-family: monospace">/track.jpg?<span class="serial"></span></span> through js window.fetch().</p>
+<p>Info (extracted from tracker image) about your previous visit to AD page:</p>
+<pre class="content"></pre>
+<script>
+    const params = location.search.slice(1).split("&")
+        .map(pair => pair.split("="))
+        .reduce((map, pair) => {
+            map[pair[0]] = pair[1];
+            return map;
+        }, {});
+    const serial = params.serial;
+    document.querySelectorAll(".serial").forEach(el => el.textContent = serial);
+
+    const contentEl = document.querySelector(".content");
+    fetch(`/track.jpg?${serial}`)
+    .then(res => res.blob())
+    .then(blob => blob.arrayBuffer())
+    .then(buffer => {
+        const idBytes = new Uint8Array(buffer, buffer.byteLength - 8, 8);
+        return Array.from(idBytes).map(byte => byte.toString(16).padStart(2, "0")).join("");
+    })
+    .then(id => fetch(`/id/${id}`))
+    .then(res => {
+        if (!res.ok) {
+            throw new Error("Unknown id");
+        }
+        return res;
+    })
+    .then(res => res.json())
+    .then(res => {
+        contentEl.textContent = Object.keys(res).map(key => `${key}: ${res[key]}`).join('\n');
+    })
+    .catch(err => {
+        console.error(err);
+        contentEl.textContent = "You haven't viewed the AD page yet";
+    })
+</script>
+</body>
+</html>

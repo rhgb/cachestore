@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>Serial: <span class="serial"></span></p>
+<p>We're loading tracker image <span style="color: darkcyan; font-family: monospace">/track.jpg?<span class="serial"></span></span> by html &lt;img&gt; element.</p>
+<p>👇👇👇 This is the tracker image loaded</p>
+<p class="image-container"></p>
+
+<script>
+    const params = location.search.slice(1).split("&")
+        .map(pair => pair.split("="))
+        .reduce((map, pair) => {
+            map[pair[0]] = pair[1];
+            return map;
+        }, {});
+    const serial = params.serial;
+    document.querySelectorAll(".serial").forEach(el => el.textContent = serial);
+    const imageEl = document.createElement("img");
+    imageEl.src = `/track.jpg?${serial}`;
+    imageEl.width = 100;
+    imageEl.height = 100;
+    document.querySelector(".image-container").appendChild(imageEl);
+</script>
+</body>
+</html>
